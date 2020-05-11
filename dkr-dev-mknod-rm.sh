@@ -68,7 +68,7 @@
 # Code
 
 device_paths=('/dev/hidraw*' '/dev/bus/usb') # array for device paths
-device_major_numbers=(242 189) # array of device major numbers
+device_major_numbers=(247 189) # array of device major numbers
 device_file_types=('c' 'b' 'p') # device file types
 device_file_types_regex=('^c.*' '^b.*' '^p.*') # regular expressions for device file types
 operations=('mknod' 'rm') # possible operations

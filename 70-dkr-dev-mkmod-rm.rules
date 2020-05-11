@@ -1,4 +1,32 @@
+# RESTART udev
+# ============
+# udevadm control --reload-rules && udevadm trigger
+
+
+# DEBUG
+# =====
+#ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", MODE="0666", RUN+="/bin/sh -c '/usr/bin/echo mknod regular $major $minor $tempnode keepassxc >> /var/log/dkr-dev-mknod-rm.log'"
+#ACTION=="add", KERNEL=="hidraw*", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", MODE="0666", RUN+="/bin/sh -c '/usr/bin/echo /usr/bin/dkr-dev-mknod-rm.sh mknod regular $major $minor $tempnode firefox_default >> /var/log/dkr-dev-mknod-rm.log'"
+
+
+# YUBIKEY rules
+# -------------
 ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", MODE="0666", RUN+="/usr/bin/dkr-dev-mknod-rm.sh mknod regular $major $minor $tempnode keepassxc"
 ACTION=="add", KERNEL=="hidraw*", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", MODE="0666", RUN+="/usr/bin/dkr-dev-mknod-rm.sh mknod regular $major $minor $tempnode firefox_default"
-
 ACTION=="remove", SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0407", RUN+="/usr/bin/dkr-dev-mknod-rm.sh rm regular keepassxc firefox_default"
+
+
+# VirtualBox rules
+# ----------------
+KERNEL=="vboxdrv", NAME="vboxdrv", OWNER="root", GROUP="vboxusers", MODE="0660"
+KERNEL=="vboxdrvu", NAME="vboxdrvu", OWNER="root", GROUP="root", MODE="0666"
+KERNEL=="vboxnetctl", NAME="vboxnetctl", OWNER="root", GROUP="vboxusers", MODE="0660"
+SUBSYSTEM=="usb_device", ACTION=="add", RUN+="/usr/lib/virtualbox/VBoxCreateUSBNode.sh $major $minor $attr{bDeviceClass}"
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", RUN+="/usr/lib/virtualbox/VBoxCreateUSBNode.sh $major $minor $attr{bDeviceClass}"
+SUBSYSTEM=="usb_device", ACTION=="remove", RUN+="/usr/lib/virtualbox/VBoxCreateUSBNode.sh --remove $major $minor"
+SUBSYSTEM=="usb", ACTION=="remove", ENV{DEVTYPE}=="usb_device", RUN+="/usr/lib/virtualbox/VBoxCreateUSBNode.sh --remove $major $minor"
+# Personal
+SUBSYSTEM=="usb_device", ACTION=="add", RUN+="/usr/bin/dkr-vboxdrv.sh add $major $minor $attr{bDeviceClass}"
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", RUN+="/usr/bin/dkr-vboxdrv.sh add $major $minor $attr{bDeviceClass}"
+SUBSYSTEM=="usb_device", ACTION=="remove", RUN+="/usr/bin/dkr-vboxdrv.sh rm $major $minor"
+SUBSYSTEM=="usb", ACTION=="remove", ENV{DEVTYPE}=="usb_device", RUN+="/usr/bin/dkr-vboxdrv.sh rm $major $minor"
